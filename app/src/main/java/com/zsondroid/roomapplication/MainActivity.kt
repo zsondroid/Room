@@ -7,6 +7,7 @@ import com.zsondroid.roomapplication.room.database.UserDatabase
 import com.zsondroid.roomapplication.room.entity.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -26,9 +27,12 @@ class MainActivity : AppCompatActivity() {
             db?.userDao()?.insert(newUser)
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val userDBList = db?.userDao()?.selectAll()
-            Log.d("kwak", "user DB : " + userDBList)
+        CoroutineScope(Dispatchers.Main).launch {
+            val users = CoroutineScope(Dispatchers.IO).async {
+                db?.userDao()?.selectAll()
+            }.await()
+
+            Log.d("maru", "User DB list : " + users)
         }
     }
 }
